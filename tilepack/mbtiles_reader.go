@@ -3,7 +3,7 @@ package tilepack
 import (
 	"database/sql"
 	"log"
-
+	"fmt"
 	_ "github.com/mattn/go-sqlite3" // Register sqlite3 database driver
 )
 
@@ -12,10 +12,23 @@ type TileData struct {
 	Data *[]byte
 }
 
+type ZoomRange struct {
+	Min int
+	Max int
+}
+
+type TileExtent struct {
+	MinX float64
+	MinY float64	
+	MaxX float64
+	MaxY float64	
+}	
 type MbtilesReader interface {
 	Close() error
 	GetTile(tile *Tile) (*TileData, error)
 	VisitAllTiles(visitor func(*Tile, []byte)) error
+	GetZoomRange() (*ZoomRange, error)
+	GetTileExtent() (*TileExtent, error)
 }
 
 type tileDataFromDatabase struct {
@@ -94,4 +107,63 @@ func (o *mbtilesReader) VisitAllTiles(visitor func(*Tile, []byte)) error {
 		visitor(t, data)
 	}
 	return nil
+}
+
+func (o *mbtilesReader) GetTileExtent() (*TileExtent, error ){
+
+	return nil, fmt.Errorf("Not implemented")
+}
+
+func (o *mbtilesReader) GetZoomRange() (*ZoomRange, error ){
+
+	min, err := o.getMinZoom()
+
+	if err != nil {
+		return nil, err
+	}
+	
+	max, err := o.getMaxZoom()
+	
+	if err != nil {
+		return nil, err
+	}
+
+	r := &ZoomRange{
+		Min: min,
+		Max: max,
+	}
+
+	return r, nil
+}
+
+func (o *mbtilesReader) getMinZoom() (int, error ){
+
+	q := "SELECT MIN(zoom_level) FROM tiles"
+
+	row := o.db.QueryRow(q)
+
+	var z int
+	err := row.Scan(&z)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return z, nil
+}
+
+func (o *mbtilesReader) getMaxZoom() (int, error ){
+
+	q := "SELECT MAX(zoom_level) FROM tiles"
+
+	row := o.db.QueryRow(q)
+
+	var z int
+	err := row.Scan(&z)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return z, nil	
 }
