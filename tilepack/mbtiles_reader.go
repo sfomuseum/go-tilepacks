@@ -17,7 +17,7 @@ type ZoomRange struct {
 	Max int
 }
 
-type TileExtent struct {
+type TilesExtent struct {
 	MinX float64
 	MinY float64	
 	MaxX float64
@@ -28,7 +28,7 @@ type MbtilesReader interface {
 	GetTile(tile *Tile) (*TileData, error)
 	VisitAllTiles(visitor func(*Tile, []byte)) error
 	GetZoomRange() (*ZoomRange, error)
-	GetTileExtent() (*TileExtent, error)
+	GetTilesExtent() (*TilesExtent, error)
 }
 
 type tileDataFromDatabase struct {
@@ -109,7 +109,7 @@ func (o *mbtilesReader) VisitAllTiles(visitor func(*Tile, []byte)) error {
 	return nil
 }
 
-func (o *mbtilesReader) GetTileExtent() (*TileExtent, error ){
+func (o *mbtilesReader) GetTilesExtent() (*TilesExtent, error ){
 
 	return nil, fmt.Errorf("Not implemented")
 }
